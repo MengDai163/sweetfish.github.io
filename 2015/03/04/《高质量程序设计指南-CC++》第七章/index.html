@@ -1,0 +1,922 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-next-fish">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.1"/>
+
+
+    <meta name="description" content="敲键盘按快门玩PS的厨子" />
+
+
+
+	<meta name="keywords" content="读书笔记," />
+
+  <title> 《高质量程序设计指南-C/C++》_第七章 // Sweetfish </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">Sweetfish</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      
+        <li class="menu-item menu-item-fish">
+        <a href="http://fish.sweetfish1991.com" target="_blank">
+          <i class="menu-item-icon icon-fish"></i> <br />
+          非昔
+        </a>
+      </li>
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              《高质量程序设计指南-C/C++》_第七章
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-03-04
+          
+        </span>
+
+        
+          
+            <span class="post-category">
+              &nbsp; | &nbsp; 分类于
+              
+                <a href="/categories/高质量程序设计指南-读书笔记/">高质量程序设计指南-读书笔记</a>
+
+                
+                
+
+              
+            </span>
+          
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p>《高质量程序设计指南-C/C++》第七章读书笔记。</p>
+<a id="more"></a>
+<p>##7.1.2 指针类型及其支持的运算<br>在指针的定义中</p>
+<pre><code>int* a,b,c;
+</code></pre><p>编译器会理解为</p>
+<pre><code>int *a,b,c;
+</code></pre><p>即只有a是int型的指针，而b，c是int型的变量。</p>
+<p>　　全局指针变量的默认初始值是NULL。而对于non-static局部指针变量p，必须显式的指定初值，否则p的初始值不可预测（不是NULL）。<strong>最安全的方式，在指针声明同时初始化它，要么赋给一个有效值，要么赋予NULL。</strong></p>
+<p>　　指针加/减一个正整数i，其含义并不是在其值上直接加/减i，还要包含指针所指向对象的字节数信息。例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">int *pInt = new int[100];</div><div class="line">pInt += 50;     //编译器改写为pInt += 50*sizeof(int);  </div><div class="line">pInt ++;        //即pInt += 1</div></pre></td></tr></table></figure></p>
+<p>因此void*类型指针不能参与算术运算，只能进行赋值、比较和sizeof()操作。而且不能对void*类型指针使用“*”来取其所指向的变量。</p>
+<p>##7.2.1 数组的本质<br>　　任何数组，不论静态创建还是动态创建，其所有元素在内存中都是<strong>连续字节</strong>存放的。</p>
+<p>　　使用“[]”来引用数组元素时，编译器必须把它转换为同类型的指针表示形式，然后再编译。例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">a[3] = 100;             //转换为*(a+3) = 100;</div><div class="line">cout &lt;&lt; a[3] &lt;&lt; endl;   //转换为cout &lt;&lt; *(a+3) &lt;&lt;endl;</div></pre></td></tr></table></figure></p>
+<blockquote>
+<ul>
+<li><strong>任何两个数组之间不能直接赋值，即使是同类型数组。只能通过按元素逐个赋值，或者使用内存拷贝函数memcpy()。</strong></li>
+<li><strong>不存在元素个数为0的数组，但存在元素个数为0的容器，即空容器。</strong></li>
+<li><strong>标准C/C++不会对用户访问的数组是否越界进行任何检查，无论是静态的(编译时)检查还是动态的(运行时)检查。</strong></li>
+</ul>
+</blockquote>
+<p>##7.2.3 数组的传递<br><code>sizeof(数组名)</code>和<code>sizeof(指针)</code>的区别:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">void output(const int a[],int size)</div><div class="line">&#123;</div><div class="line">    cout&lt;&lt;sizeof(a)&lt;&lt;endl;  //4</div><div class="line">    for(int i = 0; i &lt; size; ++i)</div><div class="line">        cout&lt;&lt; a[i] &lt;&lt;endl;</div><div class="line">&#125;</div><div class="line">//mian</div><div class="line">int x[100] = &#123;0&#125;;</div><div class="line">cout&lt;&lt; sizeof(x) &lt;&lt;endl;    //400</div><div class="line">output(x,100);</div></pre></td></tr></table></figure></p>
+<p>当数组作为参数传递给函数时，其实传递的是指针，编译器会改写为<code>void output(const int *const a, int size)</code>，当在函数内部使用下标访问数组时，编译器会转换为<code>*(a+i)</code>，<strong>因为C/C++不检查数组是否越界，所以数组作为参数时必须传入数组的大小<code>size</code></strong>。 </p>
+<p>　　针对多维数组作为参数传递时，必须指定除了第一维之外的所有维长度（元素个数）。例如二维数组：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">void output(const int a[][20], int line)</div><div class="line">&#123;</div><div class="line">    cout &lt;&lt; sizeof(a) &lt;&lt;endl;   //4</div><div class="line">&#125;</div><div class="line">//main</div><div class="line">int x[10][20] = &#123;&#123;100&#125;&#125;;</div><div class="line">cout &lt;&lt; sizeof(x) &lt;&lt;endl;   //800</div><div class="line">output(x,10);</div></pre></td></tr></table></figure></p>
+<p>以下表达方式等价：</p>
+<ol>
+<li>a[i][j]</li>
+<li>*(a[i] + j)</li>
+<li>(*(a+i))[j]</li>
+<li><em>(</em>(a+i) +j)<blockquote>
+<p>注意a是指向一维数组的指针，而不是单纯的指向int类型元素的指针，因此<code>(*(a+i)+j)</code>的值实际上是<code>((a+i*sizeof(int)*n)+j*sizeof(int))</code></p>
+</blockquote>
+</li>
+</ol>
+<p>##7.2.4 动态创建、删除数组<br>数组类型和指针类型对应关系：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#数组</div><div class="line">ElemType a[m][n][b]...[x][y]</div><div class="line">#指针</div><div class="line">ElemType (*const pa)[n][b]...[x][y] //退化第一维</div></pre></td></tr></table></figure></p>
+<p>数组的创建与删除：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">#一维数组</div><div class="line">int *p = new int[1024];</div><div class="line">delete []p;</div><div class="line"></div><div class="line">#多维数组</div><div class="line">int (*p2)[4] = new int[5][4];           //退化第一维</div><div class="line">char (*p3)[5][7] = new char[20][5][7];  //退化第一维</div><div class="line">delete []p2;        //不是delete [][]p2;</div><div class="line">delete []p3;        //不是delete [][][]p3;</div></pre></td></tr></table></figure></p>
+<p>##7.3.1 字符数组和字符串<br>　　<code>字符数组</code>就是元素为字符变量的数组，而<code>字符串</code>则是以’\0’为结束符的字符数组。所以，<code>字数数组</code>不一定就是<code>字符串</code>。<br>　　字符串是可变长度的，因此无法记录自己的长度，所以加入字符’\0’来标记字符串的结束。<br>　　用字符串来初始化一个字符数组，字符数组长度要比字符串字面常量的长度大1，用来保存’\0’结束符。例如</p>
+<pre><code>char array[] = &quot;hello&quot;;
+</code></pre><p>数组array的元素为：<code>{&#39;h&#39;,&#39;e&#39;,&#39;l&#39;,&#39;l&#39;,&#39;o&#39;,&#39;\0&#39;}</code>,长度为6。</p>
+<blockquote>
+<ul>
+<li>使用字符指针(<code>char *p</code>)来引用一个字符数组，这种情况下，用来操作字符指针的库函数(如strlen,strcpy)并不知道这个字符串是来自一个字符数组，会一直寻找<code>&#39;\0&#39;</code>结束符，如果字符数组中没有<code>&#39;\0&#39;</code>结束符，就会导致“内存访问冲突”。</li>
+<li>如果一直用字符数组的下标访问字符数组，则没有必要加入<code>&#39;\0&#39;</code>，但是大多数情况下总是把字符数组用作字符串的缓冲区，所以应在字符数组结尾放入<code>&#39;\0&#39;</code>。<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">char a1[] = &#123;&apos;a&apos;,&apos;b&apos;,&apos;\0&apos;,&apos;d&apos;,&apos;e&apos;&#125;;</div><div class="line">char a2[] = &quot;hello&quot;;</div><div class="line">char *p = &quot;hello&quot;;</div><div class="line">cout&lt;&lt;sizeof(a1)&lt;&lt;endl; //5,数组占5字节</div><div class="line">cout&lt;&lt;strlen(a1)&lt;&lt;endl; //2，字符串长度2</div><div class="line">cout&lt;&lt;sizeof(a2)&lt;&lt;endl; //6，数组占6字节</div><div class="line">cout&lt;&lt;strlen(a2)&lt;&lt;endl; //5，字符串长度5</div><div class="line">cout&lt;&lt;sizeof(p)&lt;&lt;endl;  //4，指针p占4字节</div><div class="line">cout&lt;&lt;strlen(p)&lt;&lt;endl;  //5，字符串长度5</div></pre></td></tr></table></figure>
+</li>
+</ul>
+</blockquote>
+<p>##7.3.2 字符指针的误区<br>　　当使用字符指针来引用<strong>一个</strong>字符变量的时候，需要注意，因为C/C++默认<code>char*</code>表示字符串，例如:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">char ch = &apos;a&apos;;</div><div class="line">char *p = &amp;ch;      //字符指针指向字符变量</div><div class="line">cout &lt;&lt; p &lt;&lt;endl;   //错把字符指针当字符串</div><div class="line">#正确用法</div><div class="line">cout &lt;&lt; *p &lt;&lt;endl;  //取一个字符</div></pre></td></tr></table></figure></p>
+<p>##7.3.3 字符串的拷贝和比较<br>　　字符串的拷贝使用库函数<code>strcpy</code>、<code>strncpy</code>，不要试图使用“=”，这是字符指针的赋值。字符串的比较，使用库函数<code>strcmp</code>、<code>strncmp</code>等。</p>
+<blockquote>
+<p>对字符串进行复制的时候，要保证函数结束后目标字符串的结尾有<code>&#39;\0&#39;</code>结束符，某些字符串函数不会在目标字符串结尾自动追加<code>&#39;\0&#39;</code>，如<code>strncpy</code>和<code>strncat</code>，除非指定的n值比源串的长度大1，<code>strcpy</code>和<code>strcat</code>会把源串的结束符一并复制到目标串中。</p>
+</blockquote>
+<p>##7.4 函数指针</p>
+<p>函数指针和指针函数详见：[]</p>
+<p><strong>函数指针数组</strong>声明和初始化：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">double __cdecl (*fp[5])(double) = &#123;sqrt,fabs,cos,sin,exp&#125;;</div><div class="line">for(int k=0; k&lt;5; k++)</div><div class="line">&#123;</div><div class="line">    cout&lt;&lt;&quot;Result:&quot;&lt;&lt;fp[k](10.25)&lt;&lt;endl;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>##7.5 引用和指针<br><code>引用</code>定义和初始化：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">int m = 0;</div><div class="line">int&amp; n = m;</div></pre></td></tr></table></figure></p>
+<p>n是对m的引用，对n的任何操作都是对m的操作。</p>
+<blockquote>
+<ul>
+<li>引用在创建的同时必须初始化，即引用到一个有效的对象。</li>
+<li>不存在NULL引用，引用必须与合法的存储单元关联。<br>将一个引用初始化为0：<code>const int&amp; rInt = 0;</code>，实质是创建一个临时int对象0来初始化它，该临时对象一直保留到rInt销毁的时候才会销毁。</li>
+<li>引用一旦被初始化就指向一个对象，<strong>不能</strong>被改变为对另一个对象的引用。</li>
+<li>引用的创建和销毁并不会调用类的拷贝构造函数和析构函数。</li>
+<li>在语言层面，引用的用法和对象一样；在二进制层面，引用一般都通过指针实现，编译器帮我们完成了转换。</li>
+</ul>
+</blockquote>
+<p><strong>引用的作用</strong>：函数参数的引用传递。（像指针一样高效，又具有变量使用的方便性和直观性，没有<code>指针传递</code>的“权限”大，减少危险）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">void fun(int&amp; n);</div><div class="line">int a;</div><div class="line">fun(a); //a以引用的形式传递，在函数fun内修改n就修改了a</div></pre></td></tr></table></figure></p>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/读书笔记/">
+                #读书笔记
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2015/03/17/第八章/">第八章</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/03/03/《高质量程序设计指南-CC++》第六章/">《高质量程序设计指南-C/C++》_第六章</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/images/default_avatar.png" alt="Sweetfish" />
+        <p class="site-author-name">Sweetfish</p>
+      </div>
+      <p class="site-description motion-element">敲键盘按快门玩PS的厨子</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <a href="/archives">
+            <span class="site-state-item-count">19</span>
+            <span class="site-state-item-name">日志</span>
+          </a>
+        </div>
+
+        <div class="site-state-item site-state-categories">
+          <a href="/categories">
+            <span class="site-state-item-count">4</span>
+            <span class="site-state-item-name">分类</span>
+          </a>
+        </div>
+
+        <div class="site-state-item site-state-tags">
+          
+            <span class="site-state-item-count">4</span>
+            <span class="site-state-item-name">标签</span>
+          
+        </div>
+
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="links-of-author motion-element">
+        
+      </div>
+
+      
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <p class="post-toc-empty">此文章未包含目录</p>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp; 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">Sweetfish</span>
+</div>
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>.
+</div>
+
+<div class="theme-info">
+  Theme improved from&nbsp;
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>.
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+  
+
+  
+
+
+  
+</body>
+</html>

@@ -1,0 +1,981 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-next-fish">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.1"/>
+
+
+    <meta name="description" content="敲键盘按快门玩PS的厨子" />
+
+
+
+	<meta name="keywords" content="Python,图片处理," />
+
+  <title> 图片批量动态添加水印-Python实现 // Sweetfish </title>
+</head>
+
+<body>
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <div id="header" class="header">
+      <div class="header-inner">
+        <h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand">
+      <span class="logo">
+        <i class="icon-logo"></i>
+      </span>
+      <span class="site-title">Sweetfish</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+
+  <ul id="menu" class="menu">
+     
+    
+      
+      
+      <li class="menu-item menu-item-home">
+        <a href="/">
+          <i class="menu-item-icon icon-home"></i> <br />
+          首页
+        </a>
+      </li>
+    
+      
+      
+      <li class="menu-item menu-item-archives">
+        <a href="/archives">
+          <i class="menu-item-icon icon-archives"></i> <br />
+          归档
+        </a>
+      </li>
+    
+      
+      
+      <li class="menu-item menu-item-categories">
+        <a href="/categories">
+          <i class="menu-item-icon icon-categories"></i> <br />
+          分类
+        </a>
+      </li>
+    
+      
+      
+        <li class="menu-item menu-item-fish">
+        <a href="http://fish.sweetfish1991.com" target="_blank">
+          <i class="menu-item-icon icon-fish"></i> <br />
+          非昔
+        </a>
+      </li>
+      
+      <li class="menu-item menu-item-about">
+        <a href="/about">
+          <i class="menu-item-icon icon-about"></i> <br />
+          关于
+        </a>
+      </li>
+    
+  </ul>
+
+
+      </div>
+    </div>
+
+    <div id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+            
+          
+
+          <div id="posts" class="posts-expand">
+            
+  
+
+  <div class="post post-type-normal ">
+    <div class="post-header">
+
+      
+      
+        <h1 class="post-title">
+          
+          
+            
+              图片批量动态添加水印-Python实现
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          
+            发表于 2015-05-05
+          
+        </span>
+
+        
+          
+            <span class="post-category">
+              &nbsp; | &nbsp; 分类于
+              
+                <a href="/categories/Python/">Python</a>
+
+                
+                
+
+              
+            </span>
+          
+        
+
+        
+          
+        
+      </div>
+    </div>
+
+    
+      <div class="post-body">
+
+        
+        
+
+        
+          <p>##一. 前言</p>
+<p>　　最近在做一个照片墙，设计思路就是一个类似瀑布流的设计，预览时显示一个小图，点击小图时再显示清晰大图。而且，数码照片经过后期处理之后一般都在<code>20M</code>左右，不适合直接做为网络图片显示。所以针对原片，需要压缩出一个<code>500KB</code>左右的预览小图和一个<code>2MB</code>左右清晰大图。但是每张照片都要用PS进行压缩，又太花费时间，所以从一个工科男的角度，我需要一个批处理程序。</p>
+<a id="more"></a>
+<p>　　处理图片，这自然而然就要想到Python<del>大法好</del>。</p>
+<p>##二. 准备工作</p>
+<ul>
+<li>首先熟悉Python的图形库</li>
+<li>设计图片大小和水印添加方式</li>
+<li>梳理整体流程</li>
+</ul>
+<p>那么，开始一段<del>伪</del>设计之路吧。</p>
+<p>##三. Python图形库PIL</p>
+<p>　　百度一下就知道Python的最常用的图形库就是PIL，快刀斩乱麻，打开命令行马上安装：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pip install PIL</div></pre></td></tr></table></figure></p>
+<p>　　Duang一下,一行红字：<br><img src="http://i.imgur.com/9kNvb6A.jpg" alt=""><br>　　好的，加参数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pip install PIL --allow-external PIL</div></pre></td></tr></table></figure></p>
+<p>　　Duang一下,又一行红字：<br><img src="http://i.imgur.com/7XFaWKC.jpg" alt=""><br>　　好的，再加参数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pip install PIL --allow-external PIL --allow-unverified PIL</div></pre></td></tr></table></figure></p>
+<p>　　欧凯，一切都平静了。<br><img src="http://i.imgur.com/njKQlif.jpg" alt=""><br>　　塔塔塔，敲上代码测试：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">from PIL import Image as image</div><div class="line">import os</div><div class="line"></div><div class="line">fpath = &apos;./2.jpg&apos;</div><div class="line">im = image.open(fpath)</div><div class="line"></div><div class="line">im = im.resize((200,200));</div><div class="line">#保存图片</div><div class="line">s_filename = &apos;2&apos; + &quot;_s.jpg&quot;;</div><div class="line">outpath = os.path.join(&apos;./&apos;,s_filename);</div><div class="line">im.save(outpath,quality=75);</div></pre></td></tr></table></figure></p>
+<p>　　保存，运行，然后，<br><img src="http://i.imgur.com/mkt1TF8.jpg" alt=""></p>
+<p>　　这又是什么鬼呀，惊得一身汗啊，只能百度一下···了，原来PIL安装完的时候提示了<code>JPEG support not available</code>，见下图：<br><img src="http://i.imgur.com/TiPwYPg.jpg" alt=""></p>
+<p>　　百度大法都是在说要安装jpeg格式的解码器，而且都是在linux下的安装方法，再切到linux下又太费时间重来。索性就在谷歌一下windows下的解决方法，神乎其神地发现了另外一个库，虽妥妥的安装起：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pip install pillow</div></pre></td></tr></table></figure>
+<p>　　终于代码在低沉的欢呼声中跑了起来。。。</p>
+<p>##四. 设计图片大小和水印添加方式</p>
+<p>　　针对图片的大小缩放，为了美观需要等比例缩放，我将小图片的 宽定为<code>1000px</code>，同时在Python的转换函数中降低画质，缩小图片的内存大小；大图片的宽定为<code>3000px</code>，不做画质调整。</p>
+<p>　　针对水印，由于为了美(bi)观(ge)，我事先设计了8种水印(4种样式x2种颜色)，分别粘贴在图片的四个边角上，只对大图片添加水印，水印样式如图：<br><img src="http://i.imgur.com/OsEd0s4.jpg" alt=""></p>
+<p>4种样式：</p>
+<ul>
+<li>左边竖立：可以应用于左上角和左下角</li>
+<li>右边竖立：可以应用于右上角和右下角</li>
+<li>下边横立：可以应用于左下角和右下角</li>
+<li>上边横立：可以应用于左上角和右上角</li>
+</ul>
+<p>2种颜色：</p>
+<ul>
+<li>绿色</li>
+<li>蓝色</li>
+</ul>
+<p>　　以此可以看出，每个边角有两个样式(竖立和横立式)，样式由代码直接随机产生；每个水印又有两种颜色(蓝色和绿色)可以选择，颜色通过计算得出。所以<strong>图片的每个边角有4种水印可以选择，其中样式是随机选择，颜色是通过计算得出</strong>。</p>
+<p>##整体流程设计</p>
+<p>###目录结构</p>
+<p>针对在当前目录下：</p>
+<ul>
+<li>创建<code>pic</code>目录用于存放需要处理的原始图片</li>
+<li>创建<code>mask</code>目录用于存放水印图片。</li>
+<li>创建<code>imgs-small</code>目录用于存放处理后的小图片</li>
+<li>创建<code>imgs-big</code>目录用于存放处理后的大图片</li>
+</ul>
+<p><img src="http://i.imgur.com/oCQ6I3X.jpg" alt=""></p>
+<p>目录的存储变量(<del>滥用全局变量了呀</del>)如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">#读取需要处理的总目录，默认当前目录</div><div class="line">inputpath=&quot;.&quot;</div><div class="line">#小画质图片的输出路径</div><div class="line">s_outfilrpath = &quot;./imgs-small&quot;</div><div class="line">#高画质图片的输出路径</div><div class="line">b_outfilrpath = &quot;./imgs-big&quot;</div><div class="line">#水印的文件夹名称</div><div class="line">maskpath = &quot;mask&quot;</div><div class="line">#需要处理的图片文件夹名称</div><div class="line">picturePath = &quot;pic&quot;</div><div class="line">#保存读入图片的高宽比例</div><div class="line">H2W_ratio = 0.0</div></pre></td></tr></table></figure>
+<p>###代码函数结构:</p>
+<p>####大体函数结构：</p>
+<ol>
+<li><strong>遍历文件夹函数(<em>readDirPath</em>)：</strong>遍历给定文件夹下的jpg格式图片</li>
+<li><strong>图片转换函数(<em>convertImage</em>)：</strong>将读入的图片转换成大小两个图片</li>
+<li><strong>小图片转换保存函数(<em>saveSmallPicture</em>)：</strong>将读入的图片按固定的宽度等比例缩小并保存到设定的输出目录</li>
+<li><strong>大图片转换保存函数(<em>saveBigPicture</em>)：</strong>将读入的图片按固定的宽度等比例放大，然后添加水印，最后保存到设定的输出目录</li>
+<li><strong>添加水印函数(<em>addMask</em>)：</strong>对读入的图片计算水印的位置和颜色，粘贴水印，最后返回粘贴水印后的图片。</li>
+</ol>
+<p>####各函数设计思路</p>
+<p>#####1. 遍历文件夹函数(<em>readDirPath</em>)</p>
+<p>　　主要使用内置的<code>os模块</code>进行文件遍历，代码如下，其中<code>dirPath</code>为当前文件夹路径，<code>picturePath</code>为当前文件夹下存放待处理图片的文件夹名称：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">#遍历输入文件夹下的jpg类型图片，进行图片转换</div><div class="line">def readDirPath(dirPath):</div><div class="line">	#组合图片的源目录pic文件夹</div><div class="line">	imgpath = os.path.join(dirPath,picturePath)</div><div class="line">	for x in os.listdir(imgpath):</div><div class="line">		fpath = os.path.join(imgpath,x)</div><div class="line">		if os.path.isfile(fpath):</div><div class="line">			if fpath.find(&apos;jpg&apos;)!= -1:</div><div class="line">				convertImage(fpath)</div></pre></td></tr></table></figure>
+<p>#####2. 图片转换函数(<em>convertImage</em>)</p>
+<p>　　读入图片，设置全局变量(<del>滥用全局了</del>)高宽比，分离出文件名，以便保存图片时重命名。调用大小图片保存函数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">#读入图片，转换出一个预览图和一个稍清晰的图片</div><div class="line">def convertImage(fpath):</div><div class="line">	global H2W_ratio</div><div class="line">	im = image.open(fpath)</div><div class="line">	#分离出(文件夹路径,文件名.jpg)</div><div class="line">	filename_attri = os.path.split(fpath);</div><div class="line">	#分离文件名和后缀</div><div class="line">	filename_arry = os.path.splitext(filename_attri[1])</div><div class="line">	filename = filename_arry[0]</div><div class="line">	#设置原图的高宽比</div><div class="line">	ori_width,ori_height = im.size</div><div class="line">	H2W_ratio = float(ori_height)/ori_width</div><div class="line"></div><div class="line">	#保存小画质图片</div><div class="line">	saveSmallPicture(im,filename);</div><div class="line">	#保存高画质图片</div><div class="line">	saveBigPicture(im,filename);</div><div class="line">	print &quot;finished!&quot;</div><div class="line">	print &quot;********************&quot;</div></pre></td></tr></table></figure>
+<p>#####3. 小图片转换保存函数(<em>saveSmallPicture</em>)</p>
+<p>　　对读入的图片进行等比例压缩，然后保存。其中<code>s_outfilrpath</code>为小图片保存的文件夹路径。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">#压缩转换成小画质图片，不加水印，直接保存</div><div class="line">def saveSmallPicture(s_im,s_filename):</div><div class="line">	global H2W_ratio</div><div class="line">	s_height = int(1000 * H2W_ratio);    #等比例缩放，固定宽为1000px</div><div class="line">	#压缩图片</div><div class="line">	s_im = s_im.resize((1000,s_height),image.ANTIALIAS);</div><div class="line">	#重命名</div><div class="line">	s_filename = s_filename + &quot;_s.jpg&quot;;</div><div class="line">	#保存图片</div><div class="line">	outpath = os.path.join(s_outfilrpath,s_filename);</div><div class="line">	s_im.save(outpath,quality=75);</div></pre></td></tr></table></figure>
+<p>#####4. 大图片转换保存函数(<em>saveBigPicture</em>)</p>
+<p>　　对读入的图片进行等比例放大设置，这里考虑到图片有横竖两种，所以对宽或高中的最大值进行固定值设置。然后调用添加水印函数，最后保存大图片。其中<code>b_outfilrpath</code>为大图片保存的文件夹路径。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">#转换成一个清晰的图片，直接保存</div><div class="line">def saveBigPicture(b_im,b_filename):</div><div class="line">	global H2W_ratio</div><div class="line">	#获取读入图片的大小，等比例缩放，宽固定为3000px</div><div class="line">	b_w,b_h = b_im.size;</div><div class="line">	if b_w &gt; b_h:</div><div class="line">		b_w = 3000;</div><div class="line">		b_h = int(b_w*H2W_ratio);</div><div class="line">	else:</div><div class="line">		b_h=3000;</div><div class="line">		b_w=int(b_h/H2W_ratio);</div><div class="line">	#压缩图片</div><div class="line">	b_im = b_im.resize((b_w,b_h),image.ANTIALIAS);</div><div class="line">	#添加水印</div><div class="line">	b_im = addMask(b_im)</div><div class="line">	#保存图片</div><div class="line">	b_filename = b_filename + &quot;_b.jpg&quot;;</div><div class="line">	outpath = os.path.join(b_outfilrpath, b_filename);</div><div class="line">	b_im.save(outpath,quality=100)</div></pre></td></tr></table></figure>
+<p>#####5. 添加水印函数(<em>addMask</em>)</p>
+<p>　　重点来了，这是最绕人的函数，也怪我把数据定义的太奇怪了(<del>还是水印搞多了</del>)。</p>
+<p><strong>设计思路：</strong></p>
+<p><strong>[1]. 首先确定水印的位置</strong></p>
+<blockquote>
+<p>水印首先应该覆盖在较<code>纯色</code>的角落上，即覆盖的<code>角落块</code>上，像素的颜色变化最小，这样贴上去的透明水印才看的清楚。但单独计算rgb比较每个像素的变化趋势又太复杂、费时间，所以我就想了一个折中方法。</p>
+</blockquote>
+<p>　　先将图片分割出四个<code>角落块</code>，在对单个<code>角落块</code>进行处理，设计一个函数(<em><code>getLocation</code></em>),方法如下：</p>
+<ul>
+<li>将读入的原始转为灰度图片，使用<code>im.convert(&#39;L&#39;)</code></li>
+<li>分割出原始图片的四个<code>角落块</code>，使用<code>im.crop()</code></li>
+<li>分别计算四个<code>角落块</code>区域中像素点的灰度方差(函数<em>computeVariance</em>，后面介绍)，获取灰度方差值最小的<code>角落块</code>(方差最小说明<code>角落块</code>的灰度值变化幅度最小，画面中图形颜色变化不大，适合打水印)</li>
+</ul>
+<p>　　函数<em>computeVariance</em>功能为：对读入的<code>角落块</code>图片采集100个像素点(由于代码数据类型的转换float到int，对于小画质的图片，可能最后没有采集到100个点)，获取每个像素点的灰度值，然后存入list中，最后利用<code>numpy模块</code>计算list中数据的方差值。采样方式类似下图：<br><img src="http://i.imgur.com/HuOKlxZ.jpg" alt=""></p>
+<p>代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">对给定图片的采样100个点计算方差</div><div class="line">#返回采样点的方差</div><div class="line">def computeVariance(m_im):</div><div class="line">	img_arry = m_im.load()</div><div class="line">	m_w,m_h = m_im.size</div><div class="line">	pixelList=[]</div><div class="line">	n=0</div><div class="line">	#获取采样点</div><div class="line">	while n &lt;9:</div><div class="line">		t_w = int(m_w*0.1*n)</div><div class="line">		m = 0</div><div class="line">		n = n+1</div><div class="line">		while m &lt; 9:</div><div class="line">			t_h = int(m_h*0.1*m)</div><div class="line">			pixelList.append(img_arry[t_w,t_h])</div><div class="line">			m=m+1</div><div class="line">	#计算方差</div><div class="line">	m_variance = numpy.var(pixelList)</div><div class="line">	return m_variance</div></pre></td></tr></table></figure>
+<p>　　这样就找出的水印适合粘贴的位置(左上，右上，左下，右下)。函数<em><code>getLocation</code></em>的代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">#判断图片四个角，哪一块区域的图像(灰度值)变化最小(适合打水印)</div><div class="line">#location_dict存储四个角的位置坐标</div><div class="line">#返回位置(字符串表示)</div><div class="line">def getLocation(m_im,location_dict,m_w,m_h):</div><div class="line">	#把图像转换为灰度空间</div><div class="line">	m_im = m_im.convert(&quot;L&quot;)</div><div class="line">	#分割出四个角图片</div><div class="line">	#box为角落块在原始图上的左上和右下坐标(x1,y1,x2,y2)</div><div class="line">	box = (location_dict[&quot;lefttop&quot;][0], location_dict[&quot;lefttop&quot;][1], location_dict[&quot;lefttop&quot;][0]+m_w, location_dict[&quot;lefttop&quot;][1]+m_h)</div><div class="line">	lefttop_region = m_im.crop(box)</div><div class="line"></div><div class="line">	box = (location_dict[&quot;righttop&quot;][0], location_dict[&quot;righttop&quot;][1], location_dict[&quot;righttop&quot;][0]+m_w, location_dict[&quot;righttop&quot;][1]+m_h)</div><div class="line">	righttop_region = m_im.crop(box)</div><div class="line"></div><div class="line">	box = (location_dict[&quot;leftbottom&quot;][0], location_dict[&quot;leftbottom&quot;][1], location_dict[&quot;leftbottom&quot;][0]+m_w, location_dict[&quot;leftbottom&quot;][1]+m_h)</div><div class="line">	leftbottom_region = m_im.crop(box)</div><div class="line"></div><div class="line">	box = (location_dict[&quot;rightbottom&quot;][0], location_dict[&quot;rightbottom&quot;][1], location_dict[&quot;rightbottom&quot;][0]+m_w, location_dict[&quot;rightbottom&quot;][1]+m_h)</div><div class="line">	rightbottom_region = m_im.crop(box)</div><div class="line">	#分别计算四个角的方差</div><div class="line">	lefttop_variance = computeVariance(lefttop_region)</div><div class="line">	righttop_variance = computeVariance(righttop_region)</div><div class="line">	leftbottom_variance = computeVariance(leftbottom_region)</div><div class="line">	rightbottom_variance = computeVariance(rightbottom_region)</div><div class="line">	#获取最小方差的位置</div><div class="line">	t_type = &quot;lefttop&quot;</div><div class="line">	minVariance = 1000</div><div class="line">	if minVariance &gt; lefttop_variance:</div><div class="line">		minVariance = lefttop_variance</div><div class="line"></div><div class="line">	if minVariance &gt; righttop_variance:</div><div class="line">		minVariance = righttop_variance</div><div class="line">		t_type = &quot;righttop&quot;</div><div class="line"></div><div class="line">	if minVariance &gt; leftbottom_variance:</div><div class="line">		minVariance = leftbottom_variance</div><div class="line">		t_type = &quot;leftbottom&quot;</div><div class="line"></div><div class="line">	if minVariance &gt; rightbottom_variance:</div><div class="line">		minVariance = rightbottom_variance</div><div class="line">		t_type = &quot;rightbottom&quot;</div><div class="line"></div><div class="line">	return t_type</div></pre></td></tr></table></figure>
+<p><strong>[2]. 确定水印的颜色</strong></p>
+<p>　　类似于确定位置的思路，在确定了水印粘贴的位置后，对需要粘贴的<code>角落块</code>采样100个数据点，计算块内所有采样点的B(蓝色像素值)和G(绿色像素值)的均值，处理方式如下：</p>
+<ul>
+<li>当B的均值大于150是采用绿色水印</li>
+<li>当G的均值大于150时采用蓝色水印(<del>是时候再做一个红色水印了，蛤蛤</del>)</li>
+<li>当G,B均值都大于150时优先采用绿色水印(<del>醉心喜欢</del>)</li>
+<li>当G,B均值都小于150时，随机产生使用的水印颜色</li>
+<li>返回水印颜色类型：0–蓝色，1–绿色</li>
+</ul>
+<p>函数<em>computeGB</em>代码如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line">#location为确定水印粘贴的位置(字符串表示)</div><div class="line">#location_dict存储四个角的位置坐标</div><div class="line">def computeGB(m_im,location,location_dict,m_w,m_h):</div><div class="line">	print &quot;put mask on &quot;+location</div><div class="line">	#根据水印粘贴的位置，在原图中分割出水印覆盖部分的图片</div><div class="line">	box = (location_dict[location][0], location_dict[location][1], location_dict[location][0]+m_w, location_dict[location][1]+m_h)</div><div class="line">	img_region = m_im.crop(box)</div><div class="line"></div><div class="line">	img_arry = img_region.load()</div><div class="line">	t_w,t_h = img_region.size</div><div class="line">	#采样G和B</div><div class="line">	pixelGList=[]</div><div class="line">	pixelBList=[]</div><div class="line">	n=0</div><div class="line">	while n &lt;9:</div><div class="line">		t_w = int(m_w*0.1*n)</div><div class="line">		m = 0</div><div class="line">		n = n+1</div><div class="line">		while m &lt; 9:</div><div class="line">			t_h = int(m_h*0.1*m)</div><div class="line">			pixelGList.append(img_arry[t_w,t_h][1])</div><div class="line">			pixelBList.append(img_arry[t_w,t_h][2])</div><div class="line">			m=m+1</div><div class="line">	#计算G，B的均值</div><div class="line">	t_Gmean = numpy.mean(pixelGList)</div><div class="line">	t_Bmean = numpy.mean(pixelBList)</div><div class="line">	print &quot;GB:&quot;</div><div class="line">	print (t_Gmean,t_Bmean)</div><div class="line">	t_type = 0</div><div class="line">	#绿色过多，用蓝色水印</div><div class="line">	if t_Bmean &gt; 150:</div><div class="line">		t_type = 1</div><div class="line">	elif t_Gmean &gt; 150:</div><div class="line">		t_type = 0</div><div class="line">	else:</div><div class="line">		t_type = random.randint(0,1);</div><div class="line">		print &quot;random_GB&quot;</div><div class="line">	return t_type</div></pre></td></tr></table></figure></p>
+<p><strong>[3]. 读取、粘贴水印</strong></p>
+<p>　　进入最后的添加水印函数<em><code>addMask</code></em>。</p>
+<p>　　介绍函数之前，我先介绍一下水印的存储方式，8组水印，每个<code>角落块</code>有(2种颜色x2种样式)的选择(上面介绍过了)，通过list来嵌套存储水印的[名字.png]，最后的总索引为<code>mask_list</code>，如下代码所示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">#8组水印，两种颜色，两种样式</div><div class="line">blue_list_bottomleft = [&apos;mask_blue_left.png&apos;,&apos;mask_blue_bottom.png&apos;]</div><div class="line">blue_list_bottomright = [&apos;mask_blue_right.png&apos;,&apos;mask_blue_bottom.png&apos;]</div><div class="line">blue_list_topleft = [&apos;mask_blue_left.png&apos;,&apos;mask_blue_top.png&apos;]</div><div class="line">blue_list_topright = [&apos;mask_blue_right.png&apos;,&apos;mask_blue_top.png&apos;]</div><div class="line">green_list_bottomleft = [&apos;mask_green_left.png&apos;,&apos;mask_green_bottom.png&apos;]</div><div class="line">green_list_bottomright = [&apos;mask_green_right.png&apos;,&apos;mask_green_bottom.png&apos;]</div><div class="line">green_list_topleft = [&apos;mask_green_left.png&apos;,&apos;mask_green_top.png&apos;]</div><div class="line">green_list_topright = [&apos;mask_green_right.png&apos;,&apos;mask_green_top.png&apos;]</div><div class="line">#两组水印：蓝色和绿色</div><div class="line">mask_list_blue = [blue_list_topleft,blue_list_topright,blue_list_bottomleft,blue_list_bottomright];</div><div class="line">mask_list_green = [green_list_topleft,green_list_topright,green_list_bottomleft,green_list_bottomright];</div><div class="line">#总的水印索引目录</div><div class="line">mask_list = [mask_list_blue,mask_list_green]</div></pre></td></tr></table></figure></p>
+<p>函数<em><code>addMask</code></em>的设计思路：</p>
+<ul>
+<li>首先利用随机函数，随机产生水印的类型(竖立–0，横立–1)</li>
+<li>根据水印类型，任意读取一个同类型水印，计算水印的高宽比，用于等比例缩放</li>
+<li>计算一个水印间距值<code>mask_interval</code>，便于水印的美观显示</li>
+<li>按比例缩放水印，分竖立和横立两种不同的缩放方式(缩放比例在PS中事先计算好)</li>
+<li>计算两种水印(竖立，横立)在实际图片上的贴图位置(水印的左上角坐标x，y，相应地加上间隔)，存于两个list中</li>
+<li>通过计算，获取水印的粘贴位置和水印的颜色</li>
+<li>按照类型和颜色读取水印，在原图中粘贴水印到计算出的位置，使用<code>im.paste()</code></li>
+</ul>
+<p>代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div></pre></td><td class="code"><pre><div class="line">#图片添加水印</div><div class="line">#返回添加水印后的图片</div><div class="line">def addMask(m_im):</div><div class="line">	global mask_list_blue</div><div class="line">	global mask_list_green</div><div class="line">	global maskpath</div><div class="line">	global inputpath</div><div class="line"></div><div class="line">	#组合水印的文件夹目录mask</div><div class="line">	t_maskpath = os.path.join(inputpath,maskpath)</div><div class="line">	#随机获取水印类型(竖立--0，横立--1)两种</div><div class="line">	mask_type = random.randint(0,1);</div><div class="line">	#根据水印样式，读取一个同样式图片计算高宽比</div><div class="line">	t_imgpath = os.path.join(t_maskpath,mask_list_blue[0][mask_type])</div><div class="line">	im_mask = image.open(t_imgpath)</div><div class="line">	#根据类型读取水印实际大小，计算高宽比</div><div class="line">	t_w,t_h = im_mask.size</div><div class="line">	t_radio = float(t_h)/t_w</div><div class="line">	b_w,b_h = m_im.size</div><div class="line">	#按1.8%的高度读取水印离图片[边界的距离](百分比都是事先在PS中计算出来的)</div><div class="line">	mask_interval = int(b_h*0.018)</div><div class="line">	</div><div class="line">	#根据水印类型和实际图片的大小，计算出水印调整后的大小</div><div class="line">	#具体的(百分比)都是事先在PS中计算出来的</div><div class="line">	if mask_type==0:</div><div class="line">		#竖立按11%高等比例缩放</div><div class="line">		t_h = int(b_h*0.11)</div><div class="line">		t_w = int(t_h/t_radio)</div><div class="line">		im_mask=im_mask.resize((t_w,t_h))</div><div class="line">	else:</div><div class="line">		#横立按7.5%高等比例缩放</div><div class="line">		t_h = int(b_h*0.075)</div><div class="line">		t_w = int(t_h/t_radio)</div><div class="line">		im_mask=im_mask.resize((t_w,t_h))</div><div class="line">	</div><div class="line">	#计算两种水印类型(竖立，横立)在实际图片上的贴图位置(水印的左上角坐标x，y，相应地加上间隔)</div><div class="line">	maskV_location_point =&#123;&apos;lefttop&apos;:(0,mask_interval),&apos;righttop&apos;:(b_w-t_w,mask_interval),&apos;leftbottom&apos;:(0,b_h-t_h-mask_interval),\</div><div class="line">	&apos;rightbottom&apos;:(b_w-t_w,b_h-t_h-mask_interval)&#125;</div><div class="line">	maskH_location_point =&#123;&apos;lefttop&apos;:(mask_interval,0),&apos;righttop&apos;:(b_w-t_w-mask_interval,0),&apos;leftbottom&apos;:(mask_interval,b_h-t_h),\</div><div class="line">	&apos;rightbottom&apos;:(b_w-t_w-mask_interval,b_h-t_h)&#125;</div><div class="line">	mask_location = &quot;rightbottom&quot;</div><div class="line">	#获取贴图位置和具体的贴图类型(竖立--0，横立--1)</div><div class="line">	if mask_type==0:</div><div class="line">		#获取水印贴图在原图的位置(左上，右上，左下，右下)</div><div class="line">		mask_location = getLocation(m_im,maskV_location_point,t_w,t_h)</div><div class="line">		t_VHtype = getMaskType(mask_location)    #获取水印在四个角的位置下标</div><div class="line">		t_RGBtype = computeGB(m_im,mask_location,maskV_location_point,t_w,t_h)    #获取水印的颜色下标</div><div class="line">		#读取具体的水印</div><div class="line">		t_imgpath = os.path.join(t_maskpath,mask_list[t_RGBtype][t_VHtype][mask_type])</div><div class="line">		print &quot;maskpath:&quot;+t_imgpath</div><div class="line">		im_mask = image.open(t_imgpath)</div><div class="line">		im_mask = im_mask.resize((t_w,t_h))</div><div class="line">		#粘贴水印</div><div class="line">		m_im.paste(im_mask,maskV_location_point[mask_location],im_mask.convert(&apos;RGBA&apos;))</div><div class="line">	else:</div><div class="line">		mask_location = getLocation(m_im,maskH_location_point,t_w,t_h)</div><div class="line">		t_VHtype = getMaskType(mask_location)</div><div class="line">		t_RGBtype = computeGB(m_im,mask_location,maskH_location_point,t_w,t_h)</div><div class="line">		t_imgpath = os.path.join(t_maskpath,mask_list[t_RGBtype][t_VHtype][mask_type])</div><div class="line">		print &quot;maskpath:&quot;+t_imgpath</div><div class="line">		im_mask = image.open(t_imgpath)</div><div class="line">		im_mask = im_mask.resize((t_w,t_h))</div><div class="line">		m_im.paste(im_mask,maskH_location_point[mask_location],im_mask.convert(&apos;RGBA&apos;))</div><div class="line">	return m_im</div></pre></td></tr></table></figure>
+<p>其中<em><code>getMaskType</code></em>函数为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">#根据水印所在的角 返回在水印数组中的下标</div><div class="line">def getMaskType(maskLocation):</div><div class="line">	if maskLocation == &quot;lefttop&quot;:</div><div class="line">		return 0</div><div class="line">	if maskLocation == &quot;righttop&quot;:</div><div class="line">		return 1</div><div class="line">	if maskLocation == &quot;leftbottom&quot;:</div><div class="line">		return 2</div><div class="line">	if maskLocation == &quot;rightbottom&quot;:</div><div class="line">		return 3</div></pre></td></tr></table></figure>
+<p>##五. 结束<br>　　犯了一个的错误就是习惯性的使用了C的“++”操作符，在for循环中出现死循环，导致内存溢出，找了好久。。。最后折腾折腾，花了一天左右时间，还好最终效果不错，赶脚以后做图方便多了。当然代码还是很乱的(<del>蛤蛤</del>)，不知道还有没有可读性(<del>又蛤蛤</del>)，有时间再优化一下，收档存储。当图片非常多的情况下可以添加多线程处理。</p>
+<p>最后上个效果图：<br><img src="http://i.imgur.com/KxIjPCS.png" alt=""><br>水印效果：<br><img src="http://i.imgur.com/cvKTnzt.jpg" alt=""><br><img src="http://i.imgur.com/LYsh5AF.jpg" alt=""><br><img src="http://i.imgur.com/Mw56YBy.jpg" alt=""><br>照片墙地址：<a href="http://fish.sweetfish1991.com/2014/11-18/gallery/" target="_blank" rel="external">~戳我~</a></p>
+<p>体会：果然还是Python大法好啊，虽然也有不少坑(<del>蛤蛤</del>)<br>源代码：<a href="https://github.com/sweetfish/convertImage_py" target="_blank" rel="external">GitHUb</a></p>
+
+        
+      </div>
+    
+
+    
+      <div class="post-footer">
+        
+          <div class="post-tags">
+            
+              <a href="/tags/Python/">
+                #Python
+              </a>
+            
+              <a href="/tags/图片处理/">
+                #图片处理
+              </a>
+            
+          </div>
+        
+
+        
+          <div class="post-nav">
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2016/08/18/firstPage/">firstPage</a>
+              
+            </div>
+
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/03/17/第八章/">第八章</a>
+              
+            </div>
+          </div>
+        
+
+        
+        
+      </div>
+    
+  </div>
+
+
+
+  
+    <div class="comments" id="comments">
+      
+    </div>
+  
+
+          </div>
+
+          
+        </div>
+
+        
+<div class="sidebar-toggle">
+  <div class="sidebar-toggle-line-wrap">
+    <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+    <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+  </div>
+</div>
+
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-inner">
+
+    
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview" data-target="site-overview">
+          站点概览
+        </li>
+      </ul>
+    
+
+    <div class="site-overview">
+      <div class="site-author motion-element">
+        <img class="site-author-image" src="/images/default_avatar.png" alt="Sweetfish" />
+        <p class="site-author-name">Sweetfish</p>
+      </div>
+      <p class="site-description motion-element">敲键盘按快门玩PS的厨子</p>
+      <div class="site-state motion-element">
+        <div class="site-state-item site-state-posts">
+          <a href="/archives">
+            <span class="site-state-item-count">19</span>
+            <span class="site-state-item-name">日志</span>
+          </a>
+        </div>
+
+        <div class="site-state-item site-state-categories">
+          <a href="/categories">
+            <span class="site-state-item-count">4</span>
+            <span class="site-state-item-name">分类</span>
+          </a>
+        </div>
+
+        <div class="site-state-item site-state-tags">
+          
+            <span class="site-state-item-count">4</span>
+            <span class="site-state-item-name">标签</span>
+          
+        </div>
+
+      </div>
+
+      
+        <div class="feed-link motion-element">
+          <a href="/atom.xml">
+            <i class="menu-item-icon icon-feed"></i>
+            RSS
+          </a>
+        </div>
+      
+
+      <div class="links-of-author motion-element">
+        
+      </div>
+
+      
+      
+
+    </div>
+
+    
+      <div class="post-toc-wrap sidebar-panel-active">
+        <div class="post-toc-indicator-top post-toc-indicator"></div>
+        <div class="post-toc">
+          
+          
+            <p class="post-toc-empty">此文章未包含目录</p>
+          
+        </div>
+        <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+      </div>
+    
+
+  </div>
+</div>
+
+
+      </div>
+    </div>
+
+    <div id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; &nbsp; 
+  2016
+  <span class="with-love">
+    <i class="icon-heart"></i>
+  </span>
+  <span class="author">Sweetfish</span>
+</div>
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>.
+</div>
+
+<div class="theme-info">
+  Theme improved from&nbsp;
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>.
+</div>
+
+
+
+      </div>
+    </div>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('.content img').each(function () {
+        var $image = $(this);
+        var $imageWrapLink = $image.parent('a');
+
+        if ($imageWrapLink.size() < 1) {
+          $imageWrapLink = $image.wrap('<a href="' + this.getAttribute('src') + '"></a>').parent('a');
+        }
+        $imageWrapLink.addClass('fancybox');
+      });
+    });
+    $('.fancybox').fancybox({
+      helpers: {
+        overlay: {
+          locked: false
+        }
+      }
+    });
+  </script>
+
+
+  <script type="text/javascript">
+  function hasMobileUA () {
+    var nav = window.navigator;
+    var ua = nav.userAgent;
+    var pa = /iPad|iPhone|Android|Opera Mini|BlackBerry|webOS|UCWEB|Blazer|PSP|IEMobile|Symbian/g;
+
+    return pa.test(ua);
+  }
+
+  function isDesktop () {
+    return screen.width > 991 && !hasMobileUA();
+  }
+
+  function isTablet () {
+    return screen.width < 992 && screen.width > 767 && hasMobileUA();
+  }
+
+  function isMobile () {
+    return screen.width < 767 && hasMobileUA();
+  }
+
+  function escapeSelector (selector) {
+    return selector.replace(/[!"$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&")
+  }
+</script>
+
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" id="motion.global">
+  $(document).ready(function () {
+    var body = $('body');
+    var isSidebarVisible = false;
+    var sidebarToggle = $('.sidebar-toggle');
+    var sidebarToggleLine1st = $('.sidebar-toggle-line-first')
+    var sidebarToggleLine2nd = $('.sidebar-toggle-line-middle');
+    var sidebarToggleLine3rd = $('.sidebar-toggle-line-last');
+    var sidebar = $('.sidebar');
+
+    var SIDEBAR_WIDTH = '320px';
+    var SIDEBAR_DISPLAY_DURATION = 300;
+
+    var sidebarToogleLineStatusInit = {width: '100%', opacity: 1, left: 0, rotateZ: 0, top: 0};
+
+    var sidebarToggleLine1stStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine1stStatusArrow = {width: '50%', rotateZ: '-45deg', top: '2px'};
+    var sidebarToogleLine1stStatusClose = {width: '100%', rotateZ: '-45deg', top: '5px'};
+
+    var sidebarToggleLine2ndStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine2ndStatusArrow = {width: '90%'};
+    var sidebarToogleLine2ndStatusClose = {opacity: 0};
+
+    var sidebarToggleLine3rdStatusInit = sidebarToogleLineStatusInit;
+    var sidebarToggleLine3rdStatusArrow = {width: '50%', rotateZ: '45deg', top: '-2px'};
+    var sidebarToogleLine3rdStatusClose = {width: '100%', rotateZ: '45deg', top: '-5px'};
+
+    LogoAndMenuMotion();
+    sidebatToggleMotion();
+    postsListMotion();
+    backToTopMotion();
+
+
+    $(document)
+      .on('sidebar.isShowing', function () {
+        isDesktop() && body.velocity(
+          {paddingRight: SIDEBAR_WIDTH},
+          SIDEBAR_DISPLAY_DURATION
+        );
+        sidebarContentMotion();
+      })
+      .on('sidebar.isHiding', function () {});
+
+    function LogoAndMenuMotion() {
+      $.Velocity.RunSequence([
+        { e: $('.brand'), p: { opacity: 1 }, o: { duration: 100 } },
+        { e: $('.logo'), p: { opacity: 1, top: 0 }, o: { duration: 50} },
+        
+        { e: $('.logo-line-before i'), p: { translateX: "100%" }, o: { duration: 500, sequenceQueue: false } },
+        { e: $('.logo-line-after i'), p: { translateX: "-100%" }, o: { duration: 500, sequenceQueue: false } },
+        
+        { e: $('.site-title'), p: { opacity: 1, top: 0 }, o: { duration: 200 } }
+      ]);
+      $('.menu-item').velocity('transition.slideDownIn', {display: null});
+    }
+
+
+    function backToTopMotion () {
+      var b2top = $('.back-to-top');
+      b2top.on('click', function () {
+        body.velocity('scroll');
+      });
+    }
+
+    function sidebarShowMotion () {
+
+      sidebarToggleLine1st.velocity(sidebarToogleLine1stStatusClose);
+      sidebarToggleLine2nd.velocity(sidebarToogleLine2ndStatusClose);
+      sidebarToggleLine3rd.velocity(sidebarToogleLine3rdStatusClose);
+
+      sidebar.velocity({width: SIDEBAR_WIDTH}, {
+        display: 'block',
+        duration: SIDEBAR_DISPLAY_DURATION,
+        complete: function () {
+          sidebar.addClass('sidebar-active');
+          sidebar.trigger('sidebar.didShow');
+        }
+      });
+      sidebar.trigger('sidebar.isShowing');
+    }
+
+    function sidebarHideMotion () {
+      isDesktop() && body.velocity({paddingRight: 0});
+      sidebar.velocity('reverse');
+
+      sidebarToggleLine1st.velocity(sidebarToggleLine1stStatusInit);
+      sidebarToggleLine2nd.velocity(sidebarToggleLine2ndStatusInit);
+      sidebarToggleLine3rd.velocity(sidebarToggleLine3rdStatusInit);
+
+      sidebar.removeClass('sidebar-active');
+      sidebar.trigger('sidebar.isHiding');
+    };
+
+    function sidebarContentMotion () {
+      $('.sidebar .motion-element').velocity(
+        'transition.slideRightIn',
+        {stagger: 50, drag: true}
+      );
+    }
+
+    function postsListMotion () {
+      var postMotionOptions = window.postMotionOptions || {stagger: 300, drag: true};
+      $('.post').velocity('transition.slideDownIn', postMotionOptions);
+    }
+
+    function sidebatToggleMotion () {
+      sidebarToggle.on('click', function () {
+        isSidebarVisible ? sidebarHideMotion() : sidebarShowMotion();
+        isSidebarVisible = !isSidebarVisible;
+      });
+
+      sidebarToggle.hover(function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusArrow);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusArrow);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusArrow);
+      }, function () {
+        if (isSidebarVisible) {return}
+        sidebarToggleLine1st.velocity('stop').velocity(sidebarToggleLine1stStatusInit);
+        sidebarToggleLine2nd.velocity('stop').velocity(sidebarToggleLine2ndStatusInit);
+        sidebarToggleLine3rd.velocity('stop').velocity(sidebarToggleLine3rdStatusInit);
+      });
+    }
+  });
+
+</script>
+
+
+
+
+
+  
+  
+<script type="text/javascript" id="bootstrap.scrollspy.custom">
+  /* ========================================================================
+  * Bootstrap: scrollspy.js v3.3.2
+  * http://getbootstrap.com/javascript/#scrollspy
+  * ========================================================================
+  * Copyright 2011-2015 Twitter, Inc.
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+  * ======================================================================== */
+
+  /**
+   * Custom by iissnan
+   *
+   * - Add a `clear.bs.scrollspy` event.
+   * - Esacpe targets selector.
+   */
+
+
+  +function ($) {
+    'use strict';
+
+    // SCROLLSPY CLASS DEFINITION
+    // ==========================
+
+    function ScrollSpy(element, options) {
+      this.$body          = $(document.body)
+      this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
+      this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
+      this.selector       = (this.options.target || '') + ' .nav li > a'
+      this.offsets        = []
+      this.targets        = []
+      this.activeTarget   = null
+      this.scrollHeight   = 0
+
+      this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
+      this.refresh()
+      this.process()
+    }
+
+    ScrollSpy.VERSION  = '3.3.2'
+
+    ScrollSpy.DEFAULTS = {
+      offset: 10
+    }
+
+    ScrollSpy.prototype.getScrollHeight = function () {
+      return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
+    }
+
+    ScrollSpy.prototype.refresh = function () {
+      var that          = this
+      var offsetMethod  = 'offset'
+      var offsetBase    = 0
+
+      this.offsets      = []
+      this.targets      = []
+      this.scrollHeight = this.getScrollHeight()
+
+      if (!$.isWindow(this.$scrollElement[0])) {
+        offsetMethod = 'position'
+        offsetBase   = this.$scrollElement.scrollTop()
+      }
+
+      this.$body
+        .find(this.selector)
+        .map(function () {
+          var $el   = $(this)
+          var href  = $el.data('target') || $el.attr('href')
+          var $href = /^#./.test(href) && $(escapeSelector(href)) // Need to escape selector.
+
+          return ($href
+            && $href.length
+            && $href.is(':visible')
+            && [[$href[offsetMethod]().top + offsetBase, href]]) || null
+        })
+        .sort(function (a, b) { return a[0] - b[0] })
+        .each(function () {
+          that.offsets.push(this[0])
+          that.targets.push(this[1])
+        })
+
+
+    }
+
+    ScrollSpy.prototype.process = function () {
+      var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
+      var scrollHeight = this.getScrollHeight()
+      var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
+      var offsets      = this.offsets
+      var targets      = this.targets
+      var activeTarget = this.activeTarget
+      var i
+
+      if (this.scrollHeight != scrollHeight) {
+        this.refresh()
+      }
+
+      if (scrollTop >= maxScroll) {
+        return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
+      }
+
+      if (activeTarget && scrollTop < offsets[0]) {
+        $(this.selector).trigger('clear.bs.scrollspy')  // Add a custom event.
+        this.activeTarget = null
+        return this.clear()
+      }
+
+      for (i = offsets.length; i--;) {
+        activeTarget != targets[i]
+          && scrollTop >= offsets[i]
+          && (!offsets[i + 1] || scrollTop <= offsets[i + 1])
+          && this.activate(targets[i])
+      }
+    }
+
+    ScrollSpy.prototype.activate = function (target) {
+      this.activeTarget = target
+
+      this.clear()
+
+      var selector = this.selector +
+        '[data-target="' + target + '"],' +
+        this.selector + '[href="' + target + '"]'
+
+      var active = $(selector)
+        .parents('li')
+        .addClass('active')
+
+      if (active.parent('.dropdown-menu').length) {
+        active = active
+          .closest('li.dropdown')
+          .addClass('active')
+      }
+
+      active.trigger('activate.bs.scrollspy')
+    }
+
+    ScrollSpy.prototype.clear = function () {
+      $(this.selector)
+        .parentsUntil(this.options.target, '.active')
+        .removeClass('active')
+    }
+
+
+    // SCROLLSPY PLUGIN DEFINITION
+    // ===========================
+
+    function Plugin(option) {
+      return this.each(function () {
+        var $this   = $(this)
+        var data    = $this.data('bs.scrollspy')
+        var options = typeof option == 'object' && option
+
+        if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
+        if (typeof option == 'string') data[option]()
+      })
+    }
+
+    var old = $.fn.scrollspy
+
+    $.fn.scrollspy             = Plugin
+    $.fn.scrollspy.Constructor = ScrollSpy
+
+
+    // SCROLLSPY NO CONFLICT
+    // =====================
+
+    $.fn.scrollspy.noConflict = function () {
+      $.fn.scrollspy = old
+      return this
+    }
+
+
+    // SCROLLSPY DATA-API
+    // ==================
+
+    $(window).on('load.bs.scrollspy.data-api', function () {
+      $('[data-spy="scroll"]').each(function () {
+        var $spy = $(this)
+        Plugin.call($spy, $spy.data())
+      })
+    })
+
+  }(jQuery);
+</script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var $sidebarInner = $('.sidebar-inner');
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.didShow', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+          var self = this;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      $(indicator).velocity('stop').velocity({
+        opacity: action === 'show' ? 0.4 : 0
+      }, { duration: 100 });
+    }
+
+  });
+</script>
+
+
+  <script type="text/javascript" id="sidebar.nav">
+    $(document).ready(function () {
+      var html = $('html');
+
+      $('.sidebar-nav li').on('click', function () {
+        var item = $(this);
+        var activeTabClassName = 'sidebar-nav-active';
+        var activePanelClassName = 'sidebar-panel-active';
+        if (item.hasClass(activeTabClassName)) {
+          return;
+        }
+
+        var currentTarget = $('.' + activePanelClassName);
+        var target = $('.' + item.data('target'));
+
+        currentTarget.velocity('transition.slideUpOut', 200, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', 200)
+            .addClass(activePanelClassName);
+        });
+
+        item.siblings().removeClass(activeTabClassName);
+        item.addClass(activeTabClassName);
+      });
+
+      $('.post-toc a').on('click', function (e) {
+        e.preventDefault();
+        var offset = $(escapeSelector(this.getAttribute('href'))).offset().top;
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        });
+      });
+
+      // Expand sidebar on post detail page by default, when post has a toc.
+      var $tocContent = $('.post-toc-content');
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0 && isDesktop()) {
+        setTimeout(function () {
+          $('.sidebar-toggle').trigger('click');
+        }, 800);
+      }
+    });
+  </script>
+
+
+
+
+  
+
+  
+  
+
+  
+
+
+  
+</body>
+</html>
